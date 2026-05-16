@@ -3,6 +3,10 @@ name: build & push image
 on: 
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+  
 jobs:
  
   build-push:
