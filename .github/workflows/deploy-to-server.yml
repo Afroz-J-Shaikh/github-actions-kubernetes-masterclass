@@ -6,8 +6,6 @@ on:
 jobs:
 
   deploy:
-    #env:
-      #DOCKERHUB_USER: ${{ vars.DOCKERHUB_USER }}
     runs-on: ubuntu-latest
       
     steps:

@@ -27,6 +27,14 @@ jobs:
       - name: Shorten github sha
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      - name: Cache Trivy data
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: ${{ runner.os }}-trivy-db-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-trivy-db-
+
       - name: Trivy scanner
         uses: aquasecurity/trivy-action@0.35.0
         with: 
