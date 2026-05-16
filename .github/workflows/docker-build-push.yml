@@ -47,7 +47,10 @@ jobs:
         folder: [backend, frontend]
 
     steps:
-
+      
+      - name: code checkout
+        uses: actions/checkout@v4
+        
       - name: Update Kubernetes deployment manifest
         run: |
           sed -i "s|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:.*|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:${{ env.SHORT_SHA }}|" k8s/${{ matrix.folder }}.yaml
