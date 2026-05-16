@@ -1,7 +1,7 @@
 name: trivy image scan
 
 on: 
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
 
