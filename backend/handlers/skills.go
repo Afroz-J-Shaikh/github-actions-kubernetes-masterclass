@@ -21,7 +21,7 @@ func GetSkills(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	skills := []models.Skill{}
 	for rows.Next() {
@@ -83,7 +83,7 @@ func GetSkill(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	logs := []models.LearningLog{}
 	for rows.Next() {

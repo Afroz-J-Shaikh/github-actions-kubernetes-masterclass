@@ -35,7 +35,7 @@ jobs:
         run: |
           #go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.9.0
-          
+
       - name: Run golangci-lint
         run: golangci-lint run --timeout=5m
 
@@ -58,7 +58,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node_map: '20'
+          node_map: '22'
 
       # 1. Lint HTML files
       - name: Lint HTML
