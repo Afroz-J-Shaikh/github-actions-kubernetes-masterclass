@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Afroz-J-Shaikh/github-actions-kubernetes-masterclass.git
     targetRevision: main
-    path: k8s/
+    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: skillpulse
