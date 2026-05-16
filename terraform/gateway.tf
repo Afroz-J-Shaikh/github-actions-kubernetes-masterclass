@@ -19,28 +19,28 @@ locals {
 }
 
 resource "kubectl_manifest" "gateway_api_crds" {
-  for_each  = { for idx, m in local.gateway_api_crds : idx => m }
-  yaml_body = each.value
+  for_each   = { for idx, m in local.gateway_api_crds : idx => m }
+  yaml_body  = each.value
   depends_on = [module.eks]
 }
 
 
 # Step 2: Envoy Gateway Helm chart
 resource "helm_release" "envoy_gateway" {
-  name       = "eg"
-  repository = "oci://docker.io/envoyproxy"
-  chart      = "gateway-helm"
-  version    = "v1.2.6"
-  namespace  = "envoy-gateway-system"
+  name             = "eg"
+  repository       = "oci://docker.io/envoyproxy"
+  chart            = "gateway-helm"
+  version          = "v1.2.6"
+  namespace        = "envoy-gateway-system"
   create_namespace = true
 
   # Important: skip CRDs because we applied Gateway API CRDs separately
   skip_crds = true
 
   # Wait for resources to be ready
-  wait = true
-  timeout          = 300 
-  depends_on       = [kubectl_manifest.gateway_api_crds]
+  wait       = true
+  timeout    = 300
+  depends_on = [kubectl_manifest.gateway_api_crds]
 }
 
 # Step 3: Envoy Gateway extension CRDs
@@ -52,5 +52,5 @@ resource "null_resource" "envoy_gateway_crds" {
       kubectl rollout restart deployment envoy-gateway -n envoy-gateway-system
     EOT
   }
-  depends_on       = [kubectl_manifest.gateway_api_crds]
+  depends_on = [kubectl_manifest.gateway_api_crds]
 }
