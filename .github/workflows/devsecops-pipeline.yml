@@ -3,6 +3,10 @@ name: END to END DevSecOps pipeline
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'k8s/**'
+      - 'docs/**'
+      - '**/*.md'    
   workflow_dispatch:
 
 jobs:
@@ -31,8 +35,3 @@ jobs:
     uses: ./.github/workflows/image-scan.yml
     secrets: inherit
 
-  # CD : Deploy to Production
-  #deploy:
-    #needs: trivy
-    #uses: ./.github/workflows/deploy-to-server.yml
-    #secrets: inherit
