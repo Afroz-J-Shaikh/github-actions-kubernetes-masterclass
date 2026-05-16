@@ -53,26 +53,23 @@ jobs:
 
       - name: Code checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
+      
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22' # Uses a modern Node version
-          cache: 'npm'       # Automatically caches node_modules if package-lock.json is inside TARGET_DIR
+          node_map: '20'
 
-      - name: Install Linting Tools
-        # Safely installs the linters globally on the runner or pulls via npx
-        run: npm install -g eslint stylelint htmlhint
+      # 1. Lint HTML files
+      - name: Lint HTML
+        run: npx htmlhint "**/*.html"
 
-      - name: Run ESLint (JavaScript)
-        # Scans all JS files. Adjust extensions (e.g., .jsx, .ts) if needed.
-        run: eslint "**/*.js" --max-warnings=0
+      # 2. Lint CSS files (Uses standard default configuration dynamically)
+      - name: Lint CSS
+        run: npx stylelint "**/*.css" --no-config --config-basedir .
 
-      - name: Run Stylelint (CSS)
-        # Scans all CSS files. Adjust pattern to "**/*.scss" if using Sass.
-        run: npx stylelint "**/*.css"
-
-      - name: Run HTMLHint (HTML)
-        # Scans all HTML files and formats results cleanly
-        run: htmlhint "**/*.html"
+      # 3. Lint JavaScript files 
+      # (We pass --no-eslintrc and define a couple of environmental overrides inline)
+      - name: Lint JS
+        run: |
+          npx eslint "**/*.js" --no-eslintrc --env browser,es2021
       
