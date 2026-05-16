@@ -1,0 +1,40 @@
+name: build & push image
+
+on: 
+  workflow_call:
+
+jobs:
+ 
+  build-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        folder: [backend, frontend]
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.folder }}
+
+    steps:
+
+      - name: code checkout
+        uses: actions/checkout@v4
+
+      - name: docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Shorten github sha
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: build & push 
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.folder }}
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USER }}/mern-${{ matrix.folder }}:latest
+            ${{ vars.DOCKERHUB_USER }}/mern-${{ matrix.folder }}:${{ github.ref_name }}
+            ${{ vars.DOCKERHUB_USER }}/mern-${{ matrix.folder }}:${{ env.SHORT_SHA }}

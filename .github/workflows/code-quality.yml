@@ -1,0 +1,33 @@
+name: code quality
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: code checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.3'   # adjust to your Go version
+          cache: true
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=5m
+      
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: '-fmt sarif -out results.sarif ./...'

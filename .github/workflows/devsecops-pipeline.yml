@@ -1,0 +1,38 @@
+name: END to END DevSecOps pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  #CI integration with security scanning
+  code-quality:
+    uses: ./.github/workflows/code-quality.yml
+
+  secret-scan:
+    uses: ./.github/workflows/secrets-scan.yml
+
+  dependency-scan:
+    uses: ./.github/workflows/dependency-scan.yml
+
+  dockerfile-scan:
+    uses: ./.github/workflows/dockerfile-lint.yml
+ 
+  # Build once the security scans and tests are complete 
+  build:
+    needs: [code-quality, secret-scan, dependency-scan, dockerfile-scan]
+    uses: ./.github/workflows/docker-build-push.yml
+    secrets: inherit
+
+  # Image scan 
+  trivy:
+    needs: build
+    uses: ./.github/workflows/image-scan.yml
+    secrets: inherit
+
+  # CD : Deploy to Production
+  deploy:
+    needs: trivy
+    uses: ./.github/workflows/deploy-to-server.yml
+    secrets: inherit
