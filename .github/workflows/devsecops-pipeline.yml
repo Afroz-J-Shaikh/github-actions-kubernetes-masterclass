@@ -6,7 +6,9 @@ on:
     paths-ignore:
       - 'k8s/**'
       - 'docs/**'
-      - '**/*.md'    
+      - '**/*.md'
+      - 'terraform/**'    
+      - 'terraform-env/**'
   workflow_dispatch:
 
 jobs:

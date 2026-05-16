@@ -23,17 +23,17 @@ terraform {
 
 locals {
   region          = var.aws_region
-  name            = var.cluster_name
-  vpc_cidr        = "10.0.0.0/16"
-  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
-  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  private_subnets = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
-  intra_subnets   = ["10.0.7.0/24", "10.0.8.0/24", "10.0.9.0/24"]
-
+  environment     = terraform.workspace
+  name            = "${var.cluster_name}-${terraform.workspace}"
+  vpc_cidr        = var.vpc_cidr
+  azs             = slice(data.aws_availability_zones.available.names, 0, var.total_azs)
+  public_subnets  = var.public_subnets
+  private_subnets = var.private_subnets
+  intra_subnets   = var.intra_subnets
   tags = {
     Project     = "skillpulse"
     ManagedBy   = "terraform"
-    Environment = "production"
+    Environment = terraform.workspace
   }
 }
 
