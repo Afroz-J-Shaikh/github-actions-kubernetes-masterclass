@@ -1,7 +1,7 @@
 name: build & push image
 
 on: 
-  workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: write
@@ -53,7 +53,7 @@ jobs:
 
       - name: Shorten github sha
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
-        
+
       - name: Update Kubernetes deployment manifest
         run: |
           sed -i "s|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-frontend:.*|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-frontend:${{ env.SHORT_SHA }}|" k8s/30-frontend.yaml
