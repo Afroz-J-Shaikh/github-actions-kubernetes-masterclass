@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths-ignore:
       - 'k8s/**'
+      - 'argocd/**'
       - 'docs/**'
       - '**/*.md'
       - 'terraform/**'    
       - 'terraform-env/**'
+      - 'Makefile'
   workflow_dispatch:
 
 jobs:
