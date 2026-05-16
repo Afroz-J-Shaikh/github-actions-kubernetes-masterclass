@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-
+    "log"
 	"github.com/gin-gonic/gin"
 	"github.com/trainwithshubham/skillpulse/database"
 	"github.com/trainwithshubham/skillpulse/models"
@@ -11,12 +11,12 @@ import (
 func GetDashboard(c *gin.Context) {
 	var dash models.Dashboard
 
-	err := database.DB.QueryRow("SELECT COUNT(*) FROM skills").Scan(&dash.TotalSkills)
-	if err != nil {log.Printf("failed to scan total skills: %v", err)}
-	err := database.DB.QueryRow("SELECT COALESCE(SUM(hours), 0) FROM learning_logs").Scan(&dash.TotalHours)
-	if err != nil {log.Printf("failed to scan total hours: %v", err)}
-	err := database.DB.QueryRow("SELECT COUNT(*) FROM learning_logs").Scan(&dash.TotalLogs)
-	if err != nil {log.Printf("failed to scan total logs: %v", err)}
+	err1 := database.DB.QueryRow("SELECT COUNT(*) FROM skills").Scan(&dash.TotalSkills)
+	if err1 != nil {log.Printf("failed to scan total skills: %v", err1)}
+	err2 := database.DB.QueryRow("SELECT COALESCE(SUM(hours), 0) FROM learning_logs").Scan(&dash.TotalHours)
+	if err2 != nil {log.Printf("failed to scan total hours: %v", err2)}
+	err3 := database.DB.QueryRow("SELECT COUNT(*) FROM learning_logs").Scan(&dash.TotalLogs)
+	if err3 != nil {log.Printf("failed to scan total logs: %v", err3)}
 
 	err := database.DB.QueryRow(`
 		SELECT s.name FROM skills s
