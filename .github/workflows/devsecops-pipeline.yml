@@ -27,6 +27,8 @@ jobs:
   build:
     needs: [code-quality, secret-scan, dependency-scan, dockerfile-scan]
     uses: ./.github/workflows/docker-build-push.yml
+    permissions:
+      contents: write
     secrets: inherit
 
   # Image scan 
