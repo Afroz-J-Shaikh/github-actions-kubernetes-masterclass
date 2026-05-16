@@ -30,9 +30,20 @@ spec:
       labels:
         app: backend
     spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.36
+          command: ["/bin/sh", "-c", "until nc -z mysql 3306; do sleep 2; done"]
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
       containers:
         - name: backend
-          image: trainwithshubham/skillpulse-backend:latest
+          image: afroz25/skillpulse-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

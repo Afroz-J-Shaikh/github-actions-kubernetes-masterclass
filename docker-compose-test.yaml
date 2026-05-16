@@ -1,0 +1,57 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: test@123
+      MYSQL_DATABASE: skillpulse
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: test@123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - skillpulse
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    
+  backend:
+    image: afroz25/skillpulse-backend:latest
+    build: ./backend
+    restart: unless-stopped
+    networks:
+      - skillpulse
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_USER: appuser
+      DB_PASSWORD: test@123
+      DB_NAME: skillpulse
+      PORT: "8080"
+  
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: afroz25/skillpulse-frontend:latest
+    build: ./frontend
+    restart: unless-stopped
+    networks:
+      - skillpulse
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
+
+networks:
+  skillpulse:
