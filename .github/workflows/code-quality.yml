@@ -5,7 +5,7 @@ on:
 
 jobs:
 
-  validate:
+  validate-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -30,7 +30,7 @@ jobs:
         run: |
           go mod tidy
           git diff --exit-code go.mod go.sum
-          
+
       - name: Install golangci-lint from source
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -42,3 +42,37 @@ jobs:
         uses: securego/gosec@master
         with:
           args: '-fmt sarif -out results.sarif ./...'
+
+  validate-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22' # Uses a modern Node version
+          cache: 'npm'       # Automatically caches node_modules if package-lock.json is inside TARGET_DIR
+
+      - name: Install Linting Tools
+        # Safely installs the linters globally on the runner or pulls via npx
+        run: npm install -g eslint stylelint htmlhint
+
+      - name: Run ESLint (JavaScript)
+        # Scans all JS files. Adjust extensions (e.g., .jsx, .ts) if needed.
+        run: eslint "**/*.js" --max-warnings=0
+
+      - name: Run Stylelint (CSS)
+        # Scans all CSS files. Adjust pattern to "**/*.scss" if using Sass.
+        run: npx stylelint "**/*.css"
+
+      - name: Run HTMLHint (HTML)
+        # Scans all HTML files and formats results cleanly
+        run: htmlhint "**/*.html"
+      
