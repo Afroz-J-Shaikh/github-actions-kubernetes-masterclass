@@ -50,7 +50,7 @@ jobs:
       
       - name: code checkout
         uses: actions/checkout@v4
-        
+
       - name: Update Kubernetes deployment manifest
         run: |
           sed -i "s|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:.*|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:${{ env.SHORT_SHA }}|" k8s/${{ matrix.folder }}.yaml
@@ -59,6 +59,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add k8s/${{ matrix.folder }}.yml
+          git add k8s/${{ matrix.folder }}.yaml
           git diff --staged --quiet || git commit -m "ci: update bankapp image to ${{ env.SHORT_SHA }} [skip ci]"
           git push 
