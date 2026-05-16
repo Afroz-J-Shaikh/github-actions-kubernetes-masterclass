@@ -7,6 +7,10 @@ jobs:
 
   validate:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
     steps:
 
       - name: code checkout
