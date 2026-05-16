@@ -1,7 +1,7 @@
 name: build & push image
 
 on: 
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
  
@@ -35,6 +35,6 @@ jobs:
           context: ${{ matrix.folder }}
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USER }}/mern-${{ matrix.folder }}:latest
-            ${{ vars.DOCKERHUB_USER }}/mern-${{ matrix.folder }}:${{ github.ref_name }}
-            ${{ vars.DOCKERHUB_USER }}/mern-${{ matrix.folder }}:${{ env.SHORT_SHA }}
+            ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:latest
+            ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:${{ github.ref_name }}
+            ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:${{ env.SHORT_SHA }}
