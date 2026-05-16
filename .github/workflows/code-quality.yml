@@ -63,13 +63,12 @@ jobs:
       - name: Lint HTML
         run: npx htmlhint "**/*.html"
 
-      # 2. Lint CSS files (Uses standard default configuration dynamically)
+      # 2. Lint CSS files (Feeds inline configuration via a virtual file stream)
       - name: Lint CSS
         run: |
-          npx stylelint "**/*.css" --config '{"rules": {"color-no-invalid-hex": true, "block-no-empty": true}}'
+          npx stylelint "**/*.css" --config <(echo '{"rules": {"color-no-invalid-hex": true, "block-no-empty": true}}')
 
-      # 3. Lint JavaScript files 
-      # (We pass --no-eslintrc and define a couple of environmental overrides inline)
+      # 3. Lint JavaScript files (Feeds flat configuration via a virtual file stream)
       - name: Lint JS
         run: |
           npx eslint "**/*.js" --no-config-lookup --config <(echo 'export default [{ languageOptions: { globals: { window: "readonly", document: "readonly", localStorage: "readonly", fetch: "readonly", confirm: "readonly", setTimeout: "readonly", console: "readonly" } }, rules: { "no-undef": "error" } }];')
