@@ -19,21 +19,25 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26.3'   # adjust to your Go version
+          go-version: '1.26.3'
           cache: true
+          cache-dependency-path: go.sum
 
-      - name: Install dependencies
-        run: go mod tidy
+      - name: golangci-lint Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/golangci-lint
+          key: ${{ runner.os }}-golangci-lint-${{ hashFiles('backend/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golangci-lint-
 
       - name: Verify go.mod is tidy
-        # Fails the build if 'go mod tidy' generates any git diff changes
         run: |
           go mod tidy
           git diff --exit-code go.mod go.sum
 
-      - name: Install golangci-lint from source
+      - name: Install golangci-lint from binary
         run: |
-          #go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.9.0
 
       - name: Run golangci-lint
@@ -42,7 +46,7 @@ jobs:
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
-          args: '-fmt sarif -out results.sarif ./...'
+          args: './...'
 
   validate-frontend:
     runs-on: ubuntu-latest
