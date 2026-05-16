@@ -41,6 +41,7 @@ jobs:
 
   update-deployment:
     runs-on: ubuntu-latest
+    needs: build-push
     strategy:
       matrix:
         folder: [backend, frontend]
@@ -49,7 +50,7 @@ jobs:
 
       - name: Update Kubernetes deployment manifest
         run: |
-          sed -i "s|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:.*|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:${{ env.SHORT_SHA }}|" k8s/${{ matrix.folder }}.yml
+          sed -i "s|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:.*|image: ${{ vars.DOCKERHUB_USER }}/skillpulse-${{ matrix.folder }}:${{ env.SHORT_SHA }}|" k8s/${{ matrix.folder }}.yaml
 
       - name: Commit updated manifest
         run: |
