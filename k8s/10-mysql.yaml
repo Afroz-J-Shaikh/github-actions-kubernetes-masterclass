@@ -139,7 +139,9 @@ spec:
           configMap:
             name: mysql-init
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1	
+      kind: PersistentVolumeClaim
+      metadata:
         name: data
       spec:
         storageClassName: gp3
