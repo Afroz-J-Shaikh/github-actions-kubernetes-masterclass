@@ -3,7 +3,7 @@ FROM golang:1.26-alpine AS builder
 
 WORKDIR /app
 
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates=~20241121
 
 COPY go.mod .
 
@@ -14,7 +14,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o skillpulse .
 
 # Stage 2: Run
-FROM gcr.io/distroless/static-debian12
+FROM gcr.io/distroless/static-debian12:latest-nonroot
 
 WORKDIR /app
 
