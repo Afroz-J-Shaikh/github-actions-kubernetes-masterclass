@@ -13,6 +13,8 @@ kind: Gateway
 metadata:
   name: skillpulse-gateway
   namespace: skillpulse
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   gatewayClassName: envoy-gateway
   listeners:
@@ -22,10 +24,22 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
-      hostname: 52.27.57.250
       allowedRoutes:
         namespaces:
           from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: 52.27.57.250.nip.io
+      tls:
+        mode: Terminate
+        certificateRefs:
+        - group: ""
+          kind: Secret
+          name: skillpulse-tls
+      allowedRoutes:
+        namespaces:
+          from: Same
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -36,6 +50,10 @@ spec:
   hostnames:
     - 52.27.57.250
   parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: skillpulse-gateway
+      sectionName: https
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: skillpulse-gateway
@@ -71,7 +89,7 @@ spec:
     consistentHash:
       type: Cookie
       cookie:
-        name: BANKAPP_AFFINITY
+        name: SKILLPULSE_AFFINITY
         ttl: 3600s
   timeout:
     http:

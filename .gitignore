@@ -2,6 +2,13 @@
 .DS_Store
 Thumbs.db
 
+
+### Terraform ###
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+
 # Editor
 .vscode/
 .idea/
