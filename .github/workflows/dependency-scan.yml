@@ -44,7 +44,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'table'
-          exit-code: '1' # Fails the pipeline if vulnerabilities/secrets are found
+          exit-code: '1'
           severity: 'CRITICAL,HIGH'
 
 
