@@ -63,12 +63,18 @@ jobs:
       - name: Lint HTML
         run: npx htmlhint "**/*.html"
 
-      # 2. Lint CSS files (Feeds inline configuration via a virtual file stream)
+      # 2. Lint CSS files
+      # Dynamically creates a physical temporary config file for stylelint
       - name: Lint CSS
         run: |
-          npx stylelint "**/*.css" --config <(echo '{"rules": {"color-no-invalid-hex": true, "block-no-empty": true}}')
+          echo '{"rules": {"color-no-invalid-hex": true, "block-no-empty": true}}' > .stylelintrc.json
+          npx stylelint "**/*.css" --config .stylelintrc.json
+          rm .stylelintrc.json
 
-      # 3. Lint JavaScript files (Feeds flat configuration via a virtual file stream)
+      # 3. Lint JavaScript files
+      # Dynamically creates a physical temporary flat config file for eslint
       - name: Lint JS
         run: |
-          npx eslint "**/*.js" --no-config-lookup --config <(echo 'export default [{ languageOptions: { globals: { window: "readonly", document: "readonly", localStorage: "readonly", fetch: "readonly", confirm: "readonly", setTimeout: "readonly", console: "readonly" } }, rules: { "no-undef": "error" } }];')
+          echo 'export default [{ languageOptions: { globals: { window: "readonly", document: "readonly", localStorage: "readonly", fetch: "readonly", confirm: "readonly", setTimeout: "readonly", console: "readonly" } }, rules: { "no-undef": "error" } }];' > eslint.config.js
+          npx eslint "**/*.js" --no-config-lookup --config eslint.config.js
+          rm eslint.config.js
