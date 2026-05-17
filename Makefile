@@ -1,58 +1,119 @@
-TF_DIR    ?= terraform
-ARGOCD_MANIFEST ?= argocd/application.yaml
-ENV ?= dev
-VAR_FILE ?= dev.tfvars
-SLEEP_TIME      ?= 90s
+TF_DIR           ?= terraform
+TF_STATE_DIR     ?= state-backend
+ARGOCD_MANIFEST  ?= argocd/application.yaml
+ENV              ?= dev
+VAR_FILE         ?= terraform-env/$(ENV).tfvars
+SLEEP_TIME       ?= 90s
 
-.PHONY: all help init fmt validate plan apply destroy 
+.PHONY: all help bootstrap init fmt validate workspace plan apply deploy destroy
 
-all: ## Default: Format, initialize, validate, plan, and apply everything in sequence
-	$(MAKE) fmt
-	$(MAKE) init
-	$(MAKE) validate
-	$(MAKE) plan
-	$(MAKE) apply
-	$(MAKE) deploy
+# =========================================================
+# Default workflow
+# =========================================================
 
-help: ## Display this help screen with available commands
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+all: fmt init validate plan apply deploy ## Run full workflow
 
-init: ## Initialize remote state backend and download provider plugins
+# =========================================================
+# Help Menu
+# =========================================================
+
+help: ## Display available commands
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+	awk 'BEGIN {FS = ":.*?## "}; \
+	{printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+# =========================================================
+# Bootstrap Remote Backend (RUN ONCE)
+# Creates:
+# - S3 bucket
+# - DynamoDB lock table
+# =========================================================
+
+bootstrap: ## Create Terraform remote backend resources
+	@echo "==> Initializing Terraform backend bootstrap..."
+	terraform -chdir=$(TF_STATE_DIR) init
+
+	@echo "==> Creating S3 bucket and DynamoDB lock table..."
+	terraform -chdir=$(TF_STATE_DIR) apply -auto-approve
+
+	@echo "==> Backend infrastructure created successfully."
+
+# =========================================================
+# Initialize Terraform
+# =========================================================
+
+init: ## Initialize Terraform and backend
 	@echo "==> Initializing Terraform in '$(TF_DIR)'..."
 	terraform -chdir=$(TF_DIR) init
 
-fmt: ## Check if Terraform files match canonical formatting style
-	@echo "==> Checking Terraform formatting..."
-	terraform -chdir=$(TF_DIR) fmt
+# =========================================================
+# Terraform Formatting
+# =========================================================
 
-validate: init ## Validate the syntax and consistency of configuration files
-	@echo "==> Validating Terraform configuration..."
+fmt: ## Check Terraform formatting
+	@echo "==> Checking Terraform formatting..."
+	terraform -chdir=$(TF_STATE_DIR) fmt
+	terraform -chdir=$(TF_DIR) fmt -recursive
+
+# =========================================================
+# Workspace Handling
+# =========================================================
+
+workspace: init ## Select or create Terraform workspace
+	@echo "==> Selecting workspace: $(ENV)"
 	terraform -chdir=$(TF_DIR) workspace select $(ENV) || \
-		terraform -chdir=$(TF_DIR) workspace new $(ENV)
+	terraform -chdir=$(TF_DIR) workspace new $(ENV)
+
+# =========================================================
+# Terraform Validation
+# =========================================================
+
+validate: workspace ## Validate Terraform configuration
+	@echo "==> Validating Terraform configuration..."
 	terraform -chdir=$(TF_DIR) validate
 
-plan: init ## Generate and save a speculative execution plan
-	@echo "==> Generating execution plan..."
-	terraform -chdir=$(TF_DIR) workspace select $(ENV) || \
-		terraform -chdir=$(TF_DIR) workspace new $(ENV)
-	terraform -chdir=$(TF_DIR) plan -var-file=$(VAR_FILE)
+# =========================================================
+# Terraform Plan
+# =========================================================
 
-apply: init ## Apply changes (uses saved tfplan if present, otherwise auto-approves)
+plan: workspace ## Generate Terraform execution plan
+	@echo "==> Generating execution plan..."
+	terraform -chdir=$(TF_DIR) plan \
+		-var-file=$(VAR_FILE)
+
+# =========================================================
+# Terraform Apply
+# =========================================================
+
+apply: workspace ## Apply Terraform infrastructure changes
 	@echo "==> Applying infrastructure changes..."
-	terraform -chdir=$(TF_DIR) workspace select $(ENV) || \
-		terraform -chdir=$(TF_DIR) workspace new $(ENV)
-	terraform -chdir=$(TF_DIR) apply -var-file=$(VAR_FILE) -auto-approve
+	terraform -chdir=$(TF_DIR) apply \
+		-var-file=$(VAR_FILE) \
+		-auto-approve
+
 	@echo "==> Infrastructure applied successfully."
 
-deploy: init ## Deploy application in argocd
-	@echo "==> Pausing for $(SLEEP_TIME) to let remote cluster components stabilize..."
+# =========================================================
+# ArgoCD Deployment
+# =========================================================
+
+deploy: ## Deploy ArgoCD application
+	@echo "==> Waiting $(SLEEP_TIME) for cluster stabilization..."
 	sleep $(SLEEP_TIME)
-	@echo "==> Applying ArgoCD Application manifest..."
+
+	@echo "==> Deploying ArgoCD application..."
 	kubectl apply -f $(ARGOCD_MANIFEST)
+
 	@echo "==> Application deployed successfully."
 
-destroy: ## Destroy all remote infrastructure managed by this configuration
-	@echo "==> Destroying remote infrastructure..."
-	terraform -chdir=$(TF_DIR) workspace select $(ENV) || \
-		terraform -chdir=$(TF_DIR) workspace new $(ENV)
-	terraform -chdir=$(TF_DIR) destroy -var-file=$(VAR_FILE) -auto-approve
+# =========================================================
+# Terraform Destroy
+# =========================================================
+
+destroy: workspace ## Destroy Terraform-managed infrastructure
+	@echo "==> Destroying infrastructure..."
+	terraform -chdir=$(TF_DIR) destroy \
+		-var-file=$(VAR_FILE) \
+		-auto-approve
+
+	@echo "==> Infrastructure destroyed successfully."

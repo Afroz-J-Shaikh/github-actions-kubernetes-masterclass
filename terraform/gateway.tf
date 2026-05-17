@@ -61,5 +61,5 @@ resource "null_resource" "envoy_gateway_rollout" {
       kubectl rollout restart deployment envoy-gateway -n envoy-gateway-system || true
     EOT
   }
-  depends_on = [helm_release.envoy_gateway]
+  depends_on = [helm_release.envoy_gateway,helm_release.secrets_store_aws_provider]
 }

@@ -19,6 +19,13 @@ terraform {
       version = "~> 3.1"
     }
   }
+  backend "s3" {
+    bucket         = "skillpulse-tf-state-afroz"
+    key            = "eks/terraform.tfstate"
+    region         = "us-west-2"
+    dynamodb_table = "skillpulse-tf-lock"
+    encrypt        = true
+  }
 }
 
 locals {
