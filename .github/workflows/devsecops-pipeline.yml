@@ -11,6 +11,7 @@ on:
       - 'terraform/**'    
       - 'terraform-env/**'
       - 'Makefile'
+      - 'state-backend/**'
   workflow_dispatch:
 
 jobs:
