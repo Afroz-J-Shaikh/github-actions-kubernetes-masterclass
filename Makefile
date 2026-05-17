@@ -1,4 +1,4 @@
-TF_DIR    ?= terraform-env
+TF_DIR    ?= terraform
 ARGOCD_MANIFEST ?= argocd/application.yaml
 ENV ?= dev
 VAR_FILE ?= dev.tfvars
@@ -51,4 +51,4 @@ destroy: ## Destroy all remote infrastructure managed by this configuration
 	@echo "==> Destroying remote infrastructure..."
 	terraform -chdir=$(TF_DIR) workspace select $(ENV) || \
 		terraform -chdir=$(TF_DIR) workspace new $(ENV)
-	terraform -chdir=$(TF_DIR) destroy -var-file=$(VAR_FILE)
+	terraform -chdir=$(TF_DIR) destroy -var-file=$(VAR_FILE) -auto-approve

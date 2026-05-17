@@ -14,7 +14,7 @@ module "eks" {
 
   # Cluster creator gets admin access via access_entries
   enable_cluster_creator_admin_permissions = true
-
+  enable_irsa                              = true
   # EKS Add-ons (latest versions auto-resolved)
   addons = {
     coredns = {
@@ -54,7 +54,7 @@ module "eks" {
       max_size       = var.node_max_count
 
       tags = {
-        NodeGroup = "skillpulse-ng"
+        NodeGroup = "skillpulse-ng-${local.environment}"
       }
     }
   }

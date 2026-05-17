@@ -14,4 +14,6 @@ resource "helm_release" "kube_prometheus" {
       }
     }
   })]
+
+  depends_on = [module.eks]
 }

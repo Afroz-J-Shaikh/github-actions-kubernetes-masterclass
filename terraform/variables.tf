@@ -34,8 +34,36 @@ variable "node_max_count" {
   default     = 5
 }
 
-variable "gateway_api_crd_version" {
-  description = "Gateway api crd version"
+variable "vpc_cidr" {
+  description = "VPC cidr range"
   type        = string
-  default     = "v1.2.1"
+  default     = "10.0.0.0/16"
+}
+
+variable "total_azs" {
+  description = "Total availability zones to create"
+  type        = number
+  default     = 3
+}
+
+variable "public_subnets" {
+  description = "Public subnets cidr"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+}
+
+variable "private_subnets" {
+  description = "Public subnets cidr"
+  type        = list(string)
+  default     = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
+}
+
+variable "intra_subnets" {
+  description = "Public subnets cidr"
+  type        = list(string)
+  default     = ["10.0.7.0/24", "10.0.8.0/24", "10.0.9.0/24"]
+}
+
+variable "namespace" {
+  default = "skillpulse"
 }

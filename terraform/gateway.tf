@@ -21,7 +21,7 @@ locals {
 resource "kubectl_manifest" "gateway_api_crds" {
   for_each   = { for idx, m in local.gateway_api_crds : idx => m }
   yaml_body  = each.value
-  depends_on = [module.eks]
+  depends_on = [null_resource.update_kubeconfig]
 }
 
 
@@ -47,10 +47,19 @@ resource "helm_release" "envoy_gateway" {
 resource "null_resource" "envoy_gateway_crds" {
   provisioner "local-exec" {
     command = <<EOT
+      rm -rf /tmp/eg-chart
       helm pull oci://docker.io/envoyproxy/gateway-helm --version v1.2.6 --untar -d /tmp/eg-chart
       kubectl apply --server-side -f /tmp/eg-chart/gateway-helm/crds/generated/
-      kubectl rollout restart deployment envoy-gateway -n envoy-gateway-system
     EOT
   }
   depends_on = [kubectl_manifest.gateway_api_crds]
+}
+
+resource "null_resource" "envoy_gateway_rollout" {
+  provisioner "local-exec" {
+    command = <<EOT
+      kubectl rollout restart deployment envoy-gateway -n envoy-gateway-system || true
+    EOT
+  }
+  depends_on = [helm_release.envoy_gateway]
 }

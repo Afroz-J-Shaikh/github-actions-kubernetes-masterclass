@@ -30,6 +30,7 @@ spec:
       labels:
         app: backend
     spec:
+      serviceAccountName: secrets-sa
       initContainers:
         - name: wait-for-mysql
           image: busybox:1.36
@@ -70,6 +71,10 @@ spec:
                 secretKeyRef:
                   name: skillpulse-db
                   key: MYSQL_DATABASE
+          volumeMounts:
+            - name: secrets-store
+              mountPath: /mnt/secrets-store
+              readOnly: true
           resources:
             requests:
               cpu: 100m
@@ -88,3 +93,11 @@ spec:
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+
+            volumeAttributes:
+              secretProviderClass: aws-secrets

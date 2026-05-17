@@ -49,7 +49,7 @@ output "configure_kubectl" {
 
 output "argocd_url" {
   description = "Command to get ArgoCD url"
-  value       = "kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'' | base64 -d"
+  value       = "kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'"
 }
 
 output "argocd_initial_password" {

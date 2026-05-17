@@ -30,7 +30,7 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: 13.56.220.150.nip.io
+      hostname: 204.236.130.56.nip.io
       tls:
         mode: Terminate
         certificateRefs:
@@ -48,7 +48,7 @@ metadata:
   namespace: skillpulse
 spec:
   hostnames:
-    - 13.56.220.150.nip.io
+    - 204.236.130.56.nip.io
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
