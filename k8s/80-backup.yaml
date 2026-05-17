@@ -24,10 +24,8 @@ spec:
               command: ["/bin/bash", "-c"]
               args:
                 - |
-                  set -euo pipefail
-
-                  # install mysqldump — amazon linux uses yum
-                  yum install -y mysql --quiet
+                  set -x
+                  yum install -y mariadb105
 
                   TIMESTAMP=$(date -u '+%Y%m%d_%H%M%S')
                   BACKUP_FILE="/tmp/backup_${TIMESTAMP}.sql.gz"
