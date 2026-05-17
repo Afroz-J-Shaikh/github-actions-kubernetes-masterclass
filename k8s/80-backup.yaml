@@ -20,11 +20,14 @@ spec:
           serviceAccountName: secrets-sa
           containers:
             - name: mysql-backup
-              image: mysql:8.4
+              image: amazon/aws-cli:latest
               command: ["/bin/bash", "-c"]
               args:
                 - |
                   set -euo pipefail
+
+                  # install mysqldump — amazon linux uses yum
+                  yum install -y mysql --quiet
 
                   TIMESTAMP=$(date -u '+%Y%m%d_%H%M%S')
                   BACKUP_FILE="/tmp/backup_${TIMESTAMP}.sql.gz"
@@ -42,8 +45,6 @@ spec:
                     "${MYSQL_DATABASE}" | gzip > "${BACKUP_FILE}"
 
                   echo "✓ Dump done — uploading to s3://${S3_BUCKET_NAME}/${S3_KEY}"
-
-                  apt-get update -qq && apt-get install -y awscli -qq
 
                   aws s3 cp "${BACKUP_FILE}" "s3://${S3_BUCKET_NAME}/${S3_KEY}" \
                     --region "${AWS_REGION}"
