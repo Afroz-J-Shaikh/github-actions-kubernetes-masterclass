@@ -49,7 +49,10 @@ module "secrets_irsa_role" {
 
   provider_url = module.eks.oidc_provider
 
-  role_policy_arns = [aws_iam_policy.secrets_policy.arn]
+  role_policy_arns = [
+    aws_iam_policy.secrets_policy.arn,
+    aws_iam_policy.mysql_backup.arn
+    ]
 
   oidc_fully_qualified_subjects = ["system:serviceaccount:${var.namespace}:secrets-sa"]
 }

@@ -26,6 +26,7 @@ spec:
                 - |
                   set -x
                   yum install -y mariadb105
+                  yum install -y mariadb105 gzip
 
                   TIMESTAMP=$(date -u '+%Y%m%d_%H%M%S')
                   BACKUP_FILE="/tmp/backup_${TIMESTAMP}.sql.gz"
@@ -38,6 +39,7 @@ spec:
                     -u "${MYSQL_USER}" \
                     -p"${MYSQL_PASSWORD}" \
                     --single-transaction \
+                    --no-tablespaces \
                     --routines \
                     --triggers \
                     "${MYSQL_DATABASE}" | gzip > "${BACKUP_FILE}"
