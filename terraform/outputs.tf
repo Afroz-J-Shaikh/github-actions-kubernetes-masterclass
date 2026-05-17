@@ -71,3 +71,7 @@ output "app_url" {
   description = "Command to APP URL"
   value       = "kubectl get svc -n envoy-gateway-system -l gateway.envoyproxy.io/owning-gateway-name=skillpulse-gateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}'"
 }
+
+output "policy_arn" {
+  value = aws_iam_policy.mysql_backup.arn
+}

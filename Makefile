@@ -2,7 +2,7 @@ TF_DIR           ?= terraform
 TF_STATE_DIR     ?= state-backend
 ARGOCD_MANIFEST  ?= argocd/application.yaml
 ENV              ?= dev
-VAR_FILE         ?= terraform-env/$(ENV).tfvars
+VAR_FILE         ?= $(ENV).tfvars
 SLEEP_TIME       ?= 90s
 
 .PHONY: all help bootstrap init fmt validate workspace plan apply deploy destroy
@@ -34,6 +34,7 @@ bootstrap: ## Create Terraform remote backend resources
 	terraform -chdir=$(TF_STATE_DIR) init
 
 	@echo "==> Creating S3 bucket and DynamoDB lock table..."
+	terraform -chdir=$(TF_STATE_DIR) fmt
 	terraform -chdir=$(TF_STATE_DIR) apply -auto-approve
 
 	@echo "==> Backend infrastructure created successfully."
@@ -51,8 +52,7 @@ init: ## Initialize Terraform and backend
 # =========================================================
 
 fmt: ## Check Terraform formatting
-	@echo "==> Checking Terraform formatting..."
-	terraform -chdir=$(TF_STATE_DIR) fmt
+	@echo "==> Checking Terraform formatting..."	
 	terraform -chdir=$(TF_DIR) fmt -recursive
 
 # =========================================================
@@ -111,9 +111,17 @@ deploy: ## Deploy ArgoCD application
 # =========================================================
 
 destroy: workspace ## Destroy Terraform-managed infrastructure
+	@echo "==> Removing ArgoCD application..."
+	kubectl delete -f $(ARGOCD_MANIFEST) --ignore-not-found=true --cascade=foreground --wait=true
+	@echo "==> ArgoCD application removed."
+
 	@echo "==> Destroying infrastructure..."
 	terraform -chdir=$(TF_DIR) destroy \
 		-var-file=$(VAR_FILE) \
 		-auto-approve
-
 	@echo "==> Infrastructure destroyed successfully."
+
+	@echo "==> Destroying Terraform backend resources..."
+	terraform -chdir=$(TF_STATE_DIR) init
+	terraform -chdir=$(TF_STATE_DIR) destroy -auto-approve
+	@echo "==> Backend infrastructure destroyed."

@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "tf_state" {
   }
 
   tags = {
-    Name = "terraform-state-bucket"
+    Name        = "terraform-state-bucket"
     Project     = "skillpulse"
     ManagedBy   = "terraform"
     Environment = "shared"
@@ -93,7 +93,7 @@ resource "aws_dynamodb_table" "tf_lock" {
   deletion_protection_enabled = true
 
   tags = {
-    Name = "terraform-lock-table"
+    Name        = "terraform-lock-table"
     Project     = "skillpulse"
     ManagedBy   = "terraform"
     Environment = "shared"
