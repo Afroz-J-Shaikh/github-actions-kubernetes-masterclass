@@ -5,8 +5,8 @@ metadata:
   name: mysql-backup
   namespace: skillpulse
 spec:
-  #schedule: "0 2 * * *"    #evry day at 2
-  schedule: "*/2 * * * *"   #every 2mins, for testing
+  schedule: "0 2 * * *"    #evry day at 2
+  #schedule: "*/2 * * * *"   #every 2mins, for testing
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 2
