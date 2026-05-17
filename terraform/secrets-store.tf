@@ -5,6 +5,10 @@ resource "helm_release" "secrets_store_aws_provider" {
   chart      = "secrets-store-csi-driver-provider-aws"
   namespace  = "kube-system"
   set {
+    name  = "aws.region"
+    value = var.aws_region # e.g., "us-west-2"
+  }
+  set {
     name  = "secrets-store-csi-driver.install"
     value = "true"
   }
