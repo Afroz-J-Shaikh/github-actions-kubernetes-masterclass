@@ -12,6 +12,7 @@ all: ## Default: Format, initialize, validate, plan, and apply everything in seq
 	$(MAKE) validate
 	$(MAKE) plan
 	$(MAKE) apply
+	$(MAKE) deploy
 
 help: ## Display this help screen with available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -42,10 +43,13 @@ apply: init ## Apply changes (uses saved tfplan if present, otherwise auto-appro
 		terraform -chdir=$(TF_DIR) workspace new $(ENV)
 	terraform -chdir=$(TF_DIR) apply -var-file=$(VAR_FILE) -auto-approve
 	@echo "==> Infrastructure applied successfully."
+
+deploy: init ## Deploy application in argocd
 	@echo "==> Pausing for $(SLEEP_TIME) to let remote cluster components stabilize..."
 	sleep $(SLEEP_TIME)
 	@echo "==> Applying ArgoCD Application manifest..."
 	kubectl apply -f $(ARGOCD_MANIFEST)
+	@echo "==> Application deployed successfully."
 
 destroy: ## Destroy all remote infrastructure managed by this configuration
 	@echo "==> Destroying remote infrastructure..."
