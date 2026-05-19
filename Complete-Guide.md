@@ -611,15 +611,15 @@ Prometheus scrapes in-cluster metrics using `ServiceMonitor` and `PodMonitor` re
     envoy-gateway                                  1/1     1            1           144m
     envoy-skillpulse-skillpulse-gateway-41ed7599   1/1     1            1           120m
 
-    ```
-    kubectl rollout restart deployment/envoy-skillpulse-skillpulse-gateway-41ed7599 -n envoy-gateway-system
-    ```
+   ```
+   kubectl rollout restart deployment/envoy-skillpulse-skillpulse-gateway-41ed7599 -n envoy-gateway-system
+   ```
    Output :
     deployment.apps/envoy-skillpulse-skillpulse-gateway-41ed7599 restarted
 
-    ```
-    kubectl rollout restart deployment/envoy-gateway -n envoy-gateway-system
-    ```
+   ```
+   kubectl rollout restart deployment/envoy-gateway -n envoy-gateway-system
+   ```
    Output:
     deployment.apps/envoy-gateway restarted
 
