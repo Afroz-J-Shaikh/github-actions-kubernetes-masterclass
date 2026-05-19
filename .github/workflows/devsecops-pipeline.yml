@@ -12,6 +12,7 @@ on:
       - 'terraform-env/**'
       - 'Makefile'
       - 'state-backend/**'
+      - 'images/**'
   workflow_dispatch:
 
 jobs:
