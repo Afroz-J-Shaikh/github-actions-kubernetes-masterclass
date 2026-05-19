@@ -37,6 +37,7 @@
 - [Teardown: Step-by-Step](#teardown-step-by-step)
 - [Secrets & Environment Variables](#secrets--environment-variables)
 - [Monitoring & Observability](#monitoring--observability)
+- [Error](#error)
 
 ---
 
@@ -590,6 +591,39 @@ Grafana is exposed through the monitoring load balancer and includes dashboards 
 - Gateway and ingress metrics.
 
 Prometheus scrapes in-cluster metrics using `ServiceMonitor` and `PodMonitor` resources, and ArgoCD is exposed through its own management load balancer for application visibility and rollback control.
+
+---
+
+## Error
+
+### One error that I came accross
+
+> upstream connect error or disconnect/reset before headers. reset reason: connection timeout
+
+   - It took me hours to resolve it, evrything was working fine I checked all services, pods, logs, deployments, nginx configs, IP address in 70-gateway.yaml everything and it was all working.
+   - Nothing was broken but still this error.
+   - What I did -
+   ```
+    kubectl get deployments -n envoy-gateway-system
+   ```
+   Output :
+    NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE
+    envoy-gateway                                  1/1     1            1           144m
+    envoy-skillpulse-skillpulse-gateway-41ed7599   1/1     1            1           120m
+
+    ```
+    kubectl rollout restart deployment/envoy-skillpulse-skillpulse-gateway-41ed7599 -n envoy-gateway-system
+    ```
+   Output :
+    deployment.apps/envoy-skillpulse-skillpulse-gateway-41ed7599 restarted
+
+    ```
+    kubectl rollout restart deployment/envoy-gateway -n envoy-gateway-system
+    ```
+   Output:
+    deployment.apps/envoy-gateway restarted
+
+   - And it worked, so if the same error comes then don't panic use these commands.
 
 ---
 
