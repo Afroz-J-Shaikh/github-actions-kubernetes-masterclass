@@ -14,12 +14,8 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "tf_state" {
-  bucket = "skillpulse-tf-state-afroz"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-
+  bucket        = "skillpulse-tf-state-afroz"
+  force_destroy = true
   tags = {
     Name        = "terraform-state-bucket"
     Project     = "skillpulse"
@@ -89,8 +85,6 @@ resource "aws_dynamodb_table" "tf_lock" {
   point_in_time_recovery {
     enabled = true
   }
-
-  deletion_protection_enabled = true
 
   tags = {
     Name        = "terraform-lock-table"

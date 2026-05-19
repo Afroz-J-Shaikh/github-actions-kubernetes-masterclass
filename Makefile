@@ -110,9 +110,9 @@ deploy: ## Deploy ArgoCD application
 # Terraform Destroy
 # =========================================================
 
-destroy: workspace ## Destroy Terraform-managed infrastructure
+destroy:  ## Destroy Terraform-managed infrastructure
 	@echo "==> Removing ArgoCD application..."
-	kubectl delete -f $(ARGOCD_MANIFEST) --ignore-not-found=true --cascade=foreground --wait=true
+	kubectl delete -f $(ARGOCD_MANIFEST) --cascade
 	@echo "==> ArgoCD application removed."
 
 	@echo "==> Destroying infrastructure..."
@@ -122,6 +122,12 @@ destroy: workspace ## Destroy Terraform-managed infrastructure
 	@echo "==> Infrastructure destroyed successfully."
 
 	@echo "==> Destroying Terraform backend resources..."
+	#Empty Terraform State Bucket 
+	aws s3api delete-objects --bucket skillpulse-mysql-backups-afroz --region us-west-2 --delete "$(aws s3api list-object-versions --bucket skillpulse-mysql-backups-afroz --region us-west-2 --query '{Objects: Versions[].{Key:Key,VersionId:VersionId}}' --output json)" && aws s3api delete-objects --bucket skillpulse-mysql-backups-afroz --region us-west-2 --delete "$(aws s3api list-object-versions --bucket skillpulse-mysql-backups-afroz --region us-west-2 --query '{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}' --output json)"
+	aws s3api delete-objects --bucket skillpulse-tf-state-afroz --region us-west-2 --delete "$(aws s3api list-object-versions --bucket skillpulse-tf-state-afroz --region us-west-2 --query '{Objects: Versions[].{Key:Key,VersionId:VersionId}}' --output json)" && aws s3api delete-objects --bucket skillpulse-tf-state-afroz --region us-west-2 --delete "$(aws s3api list-object-versions --bucket skillpulse-tf-state-afroz --region us-west-2 --query '{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}' --output json)"
+
+
+	
 	terraform -chdir=$(TF_STATE_DIR) init
 	terraform -chdir=$(TF_STATE_DIR) destroy -auto-approve
 	@echo "==> Backend infrastructure destroyed."

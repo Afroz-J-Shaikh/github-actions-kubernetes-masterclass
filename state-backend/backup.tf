@@ -1,7 +1,7 @@
 resource "aws_s3_bucket" "mysql_backup" {
   # Created once, shared across envs via prefix folders
-  bucket = "skillpulse-mysql-backups-afroz"
-
+  bucket        = "skillpulse-mysql-backups-afroz"
+  force_destroy = true
   tags = {
     Name        = "skillpulse-mysql-backups"
     Project     = "skillpulse"

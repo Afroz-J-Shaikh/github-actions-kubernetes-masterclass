@@ -52,7 +52,7 @@ module "secrets_irsa_role" {
   role_policy_arns = [
     aws_iam_policy.secrets_policy.arn,
     aws_iam_policy.mysql_backup.arn
-    ]
+  ]
 
   oidc_fully_qualified_subjects = ["system:serviceaccount:${var.namespace}:secrets-sa"]
 }
