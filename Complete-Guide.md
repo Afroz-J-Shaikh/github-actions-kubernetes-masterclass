@@ -512,14 +512,25 @@ git push origin main
 
 The pipeline runs automatically, updates image tags, and ArgoCD syncs the cluster.
 
-### As I am using free certificate 
-  
-  - One thing needs to managed so the application works fine.
-  - In `70-gateway.yaml` change hosts IP address to current host IP address.
-  - After applying `make all` you will get a URL in outputs after cluster creation.
-  - `app_url = "kubectl get svc -n envoy-gateway-system -l gateway.envoyproxy.io/owning-gateway-name=skillpulse-gateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}'"`
-  - Do `nslookup url` and copy that IP address.
-  - Change the IP address in `70-gateway.yaml` to this new IP address.
+### Free Certificate Access Note
+
+Because the application uses a free certificate, one manual step is required after cluster creation.
+
+After running `make all`, get the external hostname of the Envoy Gateway load balancer from the cluster outputs.
+
+Resolve that hostname to an IP address and update `k8s/70-gateway.yaml` with the new value in the `hosts` field.
+
+```bash
+nslookup <gateway-lb-hostname>
+```
+
+For example, if the resolved IP is `50.18.213.43`, the application will be accessible at:
+
+```text
+50.18.213.43.nip.io
+```
+
+This keeps the certificate and host-based routing aligned with the current Gateway load balancer address.
 
 ---
 
