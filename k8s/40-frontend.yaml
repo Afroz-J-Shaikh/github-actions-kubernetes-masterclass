@@ -44,7 +44,7 @@ spec:
               cpu: "100m"
       containers:
         - name: frontend
-          image: afroz25/skillpulse-frontend:a7ce21c
+          image: afroz25/skillpulse-frontend:0c53edd
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
